@@ -1,0 +1,19 @@
+# Python файлове
+__pycache__/
+*.pyc
+
+# Лог файлове
+*.log
+
+# Docker файлове
+*.env
+db_data/
+db_volume/
+
+# Python virtual environments
+venv/
+.env
+
+# Потребителски данни
+*.sqlite3
+*.db
