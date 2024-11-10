@@ -8,10 +8,10 @@ app.secret_key = 'your_secret_key'
 def init_db():
     return psycopg2.connect(
         host="localhost",
-        port="5433",  # използвай този порт, както е конфигуриран в Docker Compose файла
+        port="5433",
         database="webapp_db",
         user="postgres",
-        password="your_password"  # използвай паролата, която си задал в Docker Compose
+        password="your_password"
     )
 
 # Маршрут за регистрация
@@ -23,7 +23,6 @@ def register():
         email = request.form['email']
         password = request.form['password']
         try:
-            # Свързване към базата данни и записване на потребителска информация
             conn = init_db()
             cursor = conn.cursor()
             cursor.execute('INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)',
@@ -31,7 +30,6 @@ def register():
             conn.commit()
             cursor.close()
             conn.close()
-            
             # След успешна регистрация, насочваме към страницата за успех
             return redirect(url_for('registration_success'))
         except Exception as e:
@@ -51,17 +49,15 @@ def login():
         email = request.form['email']
         password = request.form['password']
         try:
-            # Свързване към базата данни и проверка на потребителската информация
             conn = init_db()
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM users WHERE email = %s AND password = %s', (email, password))
             user = cursor.fetchone()
             cursor.close()
             conn.close()
-            
             if user:
-                # След успешен вход, насочваме към страницата за успешен вход
                 session['user'] = email
+                # След успешен вход, насочваме към страницата за успех
                 return redirect(url_for('login_success'))
             else:
                 return render_template('login.html', error="Невалидни данни за вход. Моля, опитайте отново.")
