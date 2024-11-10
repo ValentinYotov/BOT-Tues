@@ -33,12 +33,16 @@ def register():
             conn.close()
             
             # След успешна регистрация, насочваме към страницата за успех
-            session['user'] = email
-            return redirect(url_for('dashboard'))
+            return redirect(url_for('registration_success'))
         except Exception as e:
             print(f"Error during registration: {e}")
             return render_template('register.html', error="Възникна грешка. Моля, опитайте отново.")
     return render_template('register.html')
+
+# Маршрут за показване на съобщение за успешна регистрация
+@app.route('/registration_success')
+def registration_success():
+    return render_template('registration_success.html')
 
 # Маршрут за вход
 @app.route('/login', methods=['GET', 'POST'])
@@ -56,9 +60,9 @@ def login():
             conn.close()
             
             if user:
-                # След успешен вход, насочваме към страницата за успех
+                # След успешен вход, насочваме към страницата за успешен вход
                 session['user'] = email
-                return redirect(url_for('dashboard'))
+                return redirect(url_for('login_success'))
             else:
                 return render_template('login.html', error="Невалидни данни за вход. Моля, опитайте отново.")
         except Exception as e:
@@ -66,18 +70,13 @@ def login():
             return render_template('login.html', error="Възникна грешка. Моля, опитайте отново.")
     return render_template('login.html')
 
-# Маршрут за основно табло (Dashboard)
-@app.route('/dashboard')
-def dashboard():
+# Маршрут за показване на съобщение за успешен вход
+@app.route('/login_success')
+def login_success():
     if 'user' in session:
-        return render_template('dashboard.html', user=session['user'])
+        return render_template('login_success.html', user=session['user'])
     else:
         return redirect(url_for('login'))
-
-# Маршрут за информация
-@app.route('/info')
-def info():
-    return render_template('info.html')
 
 # Основен маршрут (начална страница)
 @app.route('/')

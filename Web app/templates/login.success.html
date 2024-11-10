@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Успешен вход</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Успешно влязохте в профила си, {{ user }}!</h2>
+        <p>Можете да разгледате сайта или да се върнете към началната страница.</p>
+        <a href="{{ url_for('info') }}"><button>Виж информация</button></a>
+        <a href="{{ url_for('home') }}"><button>Обратно към началната страница</button></a>
+    </div>
+</body>
+</html>
