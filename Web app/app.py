@@ -1,84 +1,50 @@
-from flask import Flask, request, render_template, redirect, url_for, session
-import psycopg2
+from flask import Flask, request, jsonify
+import sqlite3
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
 
-# Функция за свързване към базата данни
-def init_db():
-    return psycopg2.connect(
-        host="localhost",
-        port="5433",
-        database="webapp_db",
-        user="postgres",
-        password="your_password"
-    )
+# Database setup
+def init_sqlite_db():
+    conn = sqlite3.connect('database.db')
+    print("Database opened successfully")
+    conn.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, name TEXT, email TEXT)')
+    print("Table created successfully")
+    conn.close()
 
-# Маршрут за регистрация
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        email = request.form['email']
-        password = request.form['password']
-        try:
-            conn = init_db()
+init_sqlite_db()
+
+
+@app.route('/add-user/', methods=['POST'])
+def add_user():
+    try:
+        post_data = request.get_json()
+        name = post_data['name']
+        email = post_data['email']
+
+        with sqlite3.connect('database.db') as conn:
             cursor = conn.cursor()
-            cursor.execute('INSERT INTO users (first_name, last_name, email, password) VALUES (%s, %s, %s, %s)',
-                           (first_name, last_name, email, password))
+            cursor.execute("INSERT INTO users (name, email) VALUES (?, ?)", (name, email))
             conn.commit()
-            cursor.close()
-            conn.close()
-            # След успешна регистрация, насочваме към страницата за успех
-            return redirect(url_for('registration_success'))
-        except Exception as e:
-            print(f"Error during registration: {e}")
-            return render_template('register.html', error="Възникна грешка. Моля, опитайте отново.")
-    return render_template('register.html')
+            response = {'message': 'User added successfully!'}
+    except Exception as e:
+        response = {'message': str(e)}
+    return jsonify(response)
 
-# Маршрут за показване на съобщение за успешна регистрация
-@app.route('/registration_success')
-def registration_success():
-    return render_template('registration_success.html')
 
-# Маршрут за вход
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        try:
-            conn = init_db()
+@app.route('/get-users/', methods=['GET'])
+def get_users():
+    users = []
+    try:
+        with sqlite3.connect('database.db') as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM users WHERE email = %s AND password = %s', (email, password))
-            user = cursor.fetchone()
-            cursor.close()
-            conn.close()
-            if user:
-                session['user'] = email
-                # След успешен вход, насочваме към страницата за успех
-                return redirect(url_for('login_success'))
-            else:
-                return render_template('login.html', error="Невалидни данни за вход. Моля, опитайте отново.")
-        except Exception as e:
-            print(f"Error during login: {e}")
-            return render_template('login.html', error="Възникна грешка. Моля, опитайте отново.")
-    return render_template('login.html')
+            cursor.execute("SELECT * FROM users")
+            rows = cursor.fetchall()
+            for row in rows:
+                users.append({'id': row[0], 'name': row[1], 'email': row[2]})
+    except Exception as e:
+        response = {'message': str(e)}
+        return jsonify(response)
+    return jsonify(users)
 
-# Маршрут за показване на съобщение за успешен вход
-@app.route('/login_success')
-def login_success():
-    if 'user' in session:
-        return render_template('login_success.html', user=session['user'])
-    else:
-        return redirect(url_for('login'))
-
-# Основен маршрут (начална страница)
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-# Стартиране на приложението
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
