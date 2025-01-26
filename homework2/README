@@ -1,0 +1,80 @@
+
+File Handling System Using Docker Compose, MinIO, and Keycloak
+This project is a file handling platform designed to enable users to upload, retrieve, modify, and remove files via a RESTful API. It employs Docker Compose to manage services, MinIO as a local S3-compatible file storage solution, Keycloak for user authentication with JWT tokens, and a Python Flask app to implement the API endpoints.
+
+Overview of the Project
+The system provides a secure file handling service where only authenticated users can access and manage their files. It offers the following functionalities:
+
+Upload files to the MinIO S3 bucket.
+Retrieve files using a unique identifier.
+Modify existing files by their identifier.
+Remove files from the storage safely.
+Key Technologies
+Docker Compose: For managing the deployment of all required services (MinIO, Keycloak, Flask).
+MinIO: A lightweight S3-compatible file storage system.
+Keycloak: Authentication and authorization provider utilizing JWT tokens for security.
+Flask (Python): REST API framework for building backend endpoints.
+Boto3: Python library used to interact with MinIO as an S3-compatible storage system.
+System Features
+Authentication and Authorization: Secure file operations enforced through JWT tokens issued by Keycloak.
+REST API: Provides endpoints to manage files, including upload, retrieval, modification, and deletion.
+Scalable Design: Modular components make it easy to extend or configure.
+Error Management and Logging: Comprehensive error handling and logs for easier troubleshooting.
+Running the Project
+Start the system using Docker Compose:
+
+bash
+Копиране
+Редактиране
+docker-compose up --build
+Service Endpoints:
+MinIO Console: http://localhost:9001
+Username: minioadmin
+Password: minioadmin
+Keycloak Admin Console: http://localhost:8080
+Username: admin
+Password: admin
+File Management API: http://localhost:5000
+Generating a JWT Token
+To generate a JWT token for authenticating requests, use the following curl command:
+
+bash
+Копиране
+Редактиране
+curl -X POST \
+-d "client_id=file-app" \
+-d "client_secret=<your_client_secret>" \
+-d "grant_type=password" \
+-d "username=<your_username>" \
+-d "password=<your_password>" \
+http://localhost:8080/realms/FileManagement/protocol/openid-connect/token
+
+Copy the value of access_token and use it in the Authorization header for all API requests.
+
+Example API Usage
+1. Upload a File
+bash
+Копиране
+Редактиране
+curl -X POST -H "Authorization: Bearer <your_access_token>" \
+     -F "file=@example.txt" \
+     http://localhost:5000/upload
+2. Retrieve a File
+bash
+Копиране
+Редактиране
+curl -X GET -H "Authorization: Bearer <your_access_token>" \
+     http://localhost:5000/download/<file_id> --output example.txt
+3. Modify an Existing File
+bash
+Копиране
+Редактиране
+curl -X PUT -H "Authorization: Bearer <your_access_token>" \
+     -F "file=@updated_example.txt" \
+     http://localhost:5000/update/<file_id>
+4. Remove a File
+bash
+Копиране
+Редактиране
+curl -X DELETE -H "Authorization: Bearer <your_access_token>" \
+     http://localhost:5000/delete/<file_id>
