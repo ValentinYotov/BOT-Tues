@@ -3,6 +3,7 @@ import boto3
 from jose import jwt
 import os
 
+
 app = Flask(__name__)
 
 # MinIO configuration
