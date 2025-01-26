@@ -9,13 +9,16 @@ Upload files to the MinIO S3 bucket.
 Retrieve files using a unique identifier.
 Modify existing files by their identifier.
 Remove files from the storage safely.
-Key Technologies
+Key Technologies:
+
 Docker Compose: For managing the deployment of all required services (MinIO, Keycloak, Flask).
 MinIO: A lightweight S3-compatible file storage system.
 Keycloak: Authentication and authorization provider utilizing JWT tokens for security.
 Flask (Python): REST API framework for building backend endpoints.
 Boto3: Python library used to interact with MinIO as an S3-compatible storage system.
-System Features
+
+System Features:
+
 Authentication and Authorization: Secure file operations enforced through JWT tokens issued by Keycloak.
 REST API: Provides endpoints to manage files, including upload, retrieval, modification, and deletion.
 Scalable Design: Modular components make it easy to extend or configure.
@@ -23,9 +26,7 @@ Error Management and Logging: Comprehensive error handling and logs for easier t
 Running the Project
 Start the system using Docker Compose:
 
-bash
-Копиране
-Редактиране
+
 docker-compose up --build
 Service Endpoints:
 MinIO Console: http://localhost:9001
@@ -38,9 +39,7 @@ File Management API: http://localhost:5000
 Generating a JWT Token
 To generate a JWT token for authenticating requests, use the following curl command:
 
-bash
-Копиране
-Редактиране
+
 curl -X POST \
 -d "client_id=file-app" \
 -d "client_secret=<your_client_secret>" \
@@ -53,28 +52,20 @@ Copy the value of access_token and use it in the Authorization header for all AP
 
 Example API Usage
 1. Upload a File
-bash
-Копиране
-Редактиране
+
 curl -X POST -H "Authorization: Bearer <your_access_token>" \
      -F "file=@example.txt" \
      http://localhost:5000/upload
 2. Retrieve a File
-bash
-Копиране
-Редактиране
+
 curl -X GET -H "Authorization: Bearer <your_access_token>" \
      http://localhost:5000/download/<file_id> --output example.txt
 3. Modify an Existing File
-bash
-Копиране
-Редактиране
+
 curl -X PUT -H "Authorization: Bearer <your_access_token>" \
      -F "file=@updated_example.txt" \
      http://localhost:5000/update/<file_id>
 4. Remove a File
-bash
-Копиране
-Редактиране
+
 curl -X DELETE -H "Authorization: Bearer <your_access_token>" \
      http://localhost:5000/delete/<file_id>
