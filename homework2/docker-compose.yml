@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+  app:
+    build:
+      context: ./src
+    ports:
+      - "5000:5000"
+    environment:
+      - MINIO_URL=http://minio:9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - KEYCLOAK_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=MyRealm
+      - KEYCLOAK_CLIENT_ID=my-app
+      - KEYCLOAK_CLIENT_SECRET=my-client-secret
+    depends_on:
+      - minio
+      - keycloak
+
+  minio:
+    image: minio/minio
+    command: server /data
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
+    ports:
+      - "8080:8080"
+
+volumes:
+  minio-data:
